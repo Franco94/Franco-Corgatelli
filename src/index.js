@@ -101,16 +101,22 @@ class Game extends React.Component {
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
+    let moves;
+    let instructions;
 
-    //map history of moves to  list items
-    const moves = history.map((step, move) => {
-      const desc = move
-        ? 'Go to move #' + move
-        : 'Go to game start';
-      return (<li key={move}>
-        <button onClick={() => this.jumpTo(move)}>{desc}</button>
-      </li>);
-    });
+    if (history.length > 1) {
+      //map history of moves to  list items
+      moves = history.map((step, move) => {
+        const desc = move
+          ? 'Go to move #' + move
+          : 'Go to game start';
+        return (<li key={move}>
+          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+        </li>);
+      });
+    } else {
+      instructions = "Click any square to place your letter!"
+    }
 
     let status;
     let winner = this.state.winner;
@@ -129,7 +135,15 @@ class Game extends React.Component {
         <Board squares={current.squares} onClick={(i) => this.handleClick(i)}/>
       </div>
       <div className="game-info">
+        <div className="title">
+          <h2 >
+            Tic-Tac-Toe
+          </h2>
+        </div>
         <div>{status}</div>
+        <div className="instructions">
+          {instructions}
+        </div>
         <ol>{moves}</ol>
       </div>
     </div>);
