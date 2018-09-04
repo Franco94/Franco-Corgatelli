@@ -15,22 +15,33 @@ class Board extends React.Component {
   }
 
   render() {
+
+    const board = this.props.rows;
+    let squares = [];
+    let row;
+    let index = 0;
+
+    for (let i = 0; i < board.length; i++) {
+      row = [];
+
+      for (let j = 0; j < board[i].length; j++) {
+
+        //push squares into row
+        row.push(<div key={index}>
+          {this.renderSquare(i, j)}
+        </div>);
+
+        index++;
+      }
+      //push rows into board
+      squares.push(<div key={i} className="board-row">
+        {row}
+      </div>);
+
+    }
+
     return (<div>
-      <div className="board-row">
-        {this.renderSquare(0, 0)}
-        {this.renderSquare(0, 1)}
-        {this.renderSquare(0, 2)}
-      </div>
-      <div className="board-row">
-        {this.renderSquare(1, 0)}
-        {this.renderSquare(1, 1)}
-        {this.renderSquare(1, 2)}
-      </div>
-      <div className="board-row">
-        {this.renderSquare(2, 0)}
-        {this.renderSquare(2, 1)}
-        {this.renderSquare(2, 2)}
-      </div>
+      {squares}
     </div>);
   }
 }
@@ -50,6 +61,7 @@ class Game extends React.Component {
       ],
       stepNumber: 0,
       xIsNext: true,
+      descendingOrder: true,
       winner: null
     };
   }
@@ -103,6 +115,12 @@ class Game extends React.Component {
     })
   }
 
+  toggleOrder() {
+    this.setState({
+      descendingOrder: !this.state.descendingOrder
+    });
+  }
+
   render() {
     const stepNumber = this.state.stepNumber;
     const history = this.state.history;
@@ -111,6 +129,8 @@ class Game extends React.Component {
 
     let moves;
     let instructions;
+    let toggle = 'v';
+    let toggleButton;
 
     if (history.length > 1) {
       //map history of moves to list items
@@ -137,6 +157,20 @@ class Game extends React.Component {
           <button className={buttonClass} onClick={() => this.jumpTo(move)}>{desc}</button>
         </li>);
       });
+
+      //sort the moves in ascending order if toggle selected.
+      if (!this.state.descendingOrder) {
+        moves.sort(function(a, b) {
+          return b.key - a.key;
+        });
+        toggle = 'ʌ';
+      }
+
+      toggleButton = (<button className="toggleButton" onClick={() => this.toggleOrder()}>
+        {toggle}
+        <span className="tooltiptext">Toggle order</span>
+      </button>);
+
     } else {
       instructions = "Select any square to place your letter!"
     }
@@ -163,15 +197,21 @@ class Game extends React.Component {
             Tic-Tac-Toe
           </h2>
         </div>
-        <div>{status}</div>
+        <div>
+          {status}
+        </div>
         <div className="instructions">
           {instructions}
         </div>
-        <ol>{moves}</ol>
+        <div>
+          {toggleButton}
+        </div>
+        <ol>
+          {moves}
+        </ol>
       </div>
     </div>);
   }
-
 }
 
 // ========================================
