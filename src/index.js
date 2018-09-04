@@ -99,23 +99,38 @@ class Game extends React.Component {
   }
 
   render() {
+    const stepNumber = this.state.stepNumber;
     const history = this.state.history;
-    const current = history[this.state.stepNumber];
+    const current = history[stepNumber];
     let moves;
     let instructions;
 
     if (history.length > 1) {
-      //map history of moves to  list items
+      //map history of moves to list items
       moves = history.map((step, move) => {
-        const desc = move
-          ? 'Go to move #' + move
-          : 'Go to game start';
+
+        let buttonClass;
+        let desc;
+
+        if (move === stepNumber) {
+          //current
+          buttonClass = "selected";
+          desc = move
+            ? 'Move #' + move
+            : 'Game start';
+        } else {
+          desc = move
+            ? 'Go to move #' + move
+            : 'Go to game start';
+          buttonClass = "unselected";
+        }
+
         return (<li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+          <button className={buttonClass} onClick={() => this.jumpTo(move)}>{desc}</button>
         </li>);
       });
     } else {
-      instructions = "Click any square to place your letter!"
+      instructions = "Select any square to place your letter!"
     }
 
     let status;
