@@ -3,15 +3,21 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 function Square(props) {
-  return (<button className="square" onClick={props.onClick}>
+
+  let highlighted = '';
+  if (props.winner) {
+    highlighted = ' highlighted';
+  }
+
+  return (<button className={"square" + highlighted} onClick={props.onClick}>
     {props.value}
   </button>);
 }
 
 class Board extends React.Component {
 
-  renderSquare(row, col) {
-    return (<Square value={this.props.rows[row][col]} onClick={() => this.props.onClick(row, col)}/>);
+  renderSquare(row, col, winner) {
+    return (<Square value={this.props.rows[row][col]} winner={winner} onClick={() => this.props.onClick(row, col)}/>);
   }
 
   render() {
@@ -20,18 +26,36 @@ class Board extends React.Component {
     let squares = [];
     let row;
     let index = 0;
+    let winner = false;
+    let winnerSquares = this.props.winnerSquares;
 
     for (let i = 0; i < board.length; i++) {
       row = [];
 
       for (let j = 0; j < board[i].length; j++) {
 
+        if (winnerSquares) {
+
+          winner = false;
+          let k = 0;
+          while (k < winnerSquares.length && !winner) {
+
+            if (winnerSquares[k][0] === i && winnerSquares[k][1] === j) {
+              winner = true;
+            }
+
+            k++;
+          }
+
+        }
+
         //push squares into row
         row.push(<div key={index}>
-          {this.renderSquare(i, j)}
+          {this.renderSquare(i, j, winner)}
         </div>);
 
         index++;
+
       }
       //push rows into board
       squares.push(<div key={i} className="board-row">
@@ -62,7 +86,8 @@ class Game extends React.Component {
       stepNumber: 0,
       xIsNext: true,
       descendingOrder: true,
-      winner: null
+      winner: null,
+      winnerSquares: null
     };
   }
 
@@ -93,8 +118,9 @@ class Game extends React.Component {
         ]),
         stepNumber: history.length,
         xIsNext: !this.state.xIsNext,
-        //if no winner, this property does not change
-        winner: winner
+        //if no winner, this properties do not change
+        winner: winner[0],
+        winnerSquares: winner[1]
       });
     }
   }
@@ -111,7 +137,8 @@ class Game extends React.Component {
       //set to true if step is even (X's turn)
       xIsNext: ((step % 2) === 0),
       //reset winner if necessary
-      winner: winner
+      winner: winner[0],
+      winnerSquares: winner[1]
     })
   }
 
@@ -189,7 +216,7 @@ class Game extends React.Component {
 
     return (<div className="game">
       <div className="game-board">
-        <Board rows={current.rows} onClick={(row, col) => this.handleClick(row, col)}/>
+        <Board rows={current.rows} winnerSquares={this.state.winnerSquares} onClick={(row, col) => this.handleClick(row, col)}/>
       </div>
       <div className="game-info">
         <div className="title">
@@ -197,7 +224,7 @@ class Game extends React.Component {
             Tic-Tac-Toe
           </h2>
         </div>
-        <div>
+        <div className="status">
           {status}
         </div>
         <div className="instructions">
@@ -219,6 +246,9 @@ class Game extends React.Component {
 ReactDOM.render(<Game/>, document.getElementById('root'));
 
 function calculateWinner(rows) {
+  //input: board matrix
+  //output: winner + winnerSquares or array of nulls is there is no winner
+
   const lines = [
     [
       [
@@ -311,6 +341,7 @@ function calculateWinner(rows) {
   ];
   let i = 0;
   let winner = null;
+  let winnerSquares = null;
 
   while (i < lines.length && !winner) {
 
@@ -326,10 +357,11 @@ function calculateWinner(rows) {
 
     if (rows[a][b] && rows[a][b] === rows[c][d] && rows[a][b] === rows[e][f]) {
       winner = rows[a][b];
+      winnerSquares = lines[i];
     }
     i++;
   }
 
-  return winner;
+  return [winner, winnerSquares];
 
 }
