@@ -1,0 +1,27 @@
+.square {
+  background: #fff;
+  border: 1px solid #999;
+  float: left;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 34px;
+  height: 34px;
+  padding: 0;
+  text-align: center;
+  width: 34px;
+  cursor: pointer;
+}
+
+.square:focus {
+  outline: none;
+}
+
+.highlighted {
+  color: blue;
+  border-color: blue;
+  background: #cce6ff;
+}
+
+.kbd-navigation .square:focus {
+  background: #ddd;
+}
